@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repaso Parcial Anatomía — Pedro Toledo</title>
+<style>
+  :root{
+    --bg-deep: #0b1420;
+    --ink: #f2f0e8;
+    --muted: #93a0b8;
+    --a1: #e8c27a;
+    --a2: #d9636b;
+    --a3: #52b788;
+    --geni: #4ea8de;
+    --card: #131c2e;
+    --card-border: rgba(255,255,255,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 15% -5%, #1c2740 0%, var(--bg-deep) 55%);
+    color: var(--ink);
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px 14px;
+  }
+  .stage{ width:100%; max-width: 780px; }
+
+  .menu{ text-align:center; }
+  .menu h1{
+    font-size: clamp(24px, 5.5vw, 38px);
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .menu h1 span{color: var(--a1);}
+  .menu p.sub{ color: var(--muted); margin: 0 0 8px; font-size: 14.5px; }
+  .menu p.author{ color: var(--muted); margin: 0 0 28px; font-size: 12px; font-style: italic; }
+
+  .deck-grid{ display:grid; gap: 14px; grid-template-columns: 1fr; }
+  @media(min-width:560px){ .deck-grid{grid-template-columns: 1fr 1fr;} }
+
+  .deck-card{
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 20px 20px 22px;
+    text-align:left;
+    cursor:pointer;
+    transition: transform .15s ease;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+  }
+  .deck-card:hover{ transform: translateY(-4px); }
+  .deck-card .icon{
+    flex-shrink:0; width:46px; height:46px; border-radius: 12px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,.06);
+  }
+  .deck-card .icon svg{ width:26px; height:26px; }
+  .deck-card .txt{ flex:1; min-width:0; }
+  .deck-card .count{
+    position:absolute; top:14px; right:16px;
+    font-size: 22px; font-weight:800; color: rgba(255,255,255,.10);
+  }
+  .deck-card .tag{ display:block; font-size:11px; font-weight:700; letter-spacing:.02em; margin-bottom: 4px; }
+  .deck-card h3{ margin: 0 0 4px; font-size: 17px; }
+  .deck-card p{ margin:0; color: var(--muted); font-size: 12.5px; line-height:1.5;}
+
+  .deck-card.a1{ border-color: rgba(232,194,122,.25); } .deck-card.a1 .icon{background:rgba(232,194,122,.14);} .deck-card.a1 .tag{color:var(--a1);}
+  .deck-card.a2{ border-color: rgba(217,99,107,.25); } .deck-card.a2 .icon{background:rgba(217,99,107,.14);} .deck-card.a2 .tag{color:var(--a2);}
+  .deck-card.a3{ border-color: rgba(82,183,136,.25); } .deck-card.a3 .icon{background:rgba(82,183,136,.14);} .deck-card.a3 .tag{color:var(--a3);}
+  .deck-card.geni{ border-color: rgba(78,168,222,.25); } .deck-card.geni .icon{background:rgba(78,168,222,.14);} .deck-card.geni .tag{color:var(--geni);}
+  .deck-card.mix{ grid-column: 1 / -1; border-color: rgba(255,255,255,.18); }
+  .deck-card.mix .icon{ background: rgba(255,255,255,.10); }
+  .deck-card.mix .tag{ color: var(--ink); }
+
+  .hud{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; gap: 10px; }
+  .hud .pill{
+    background: var(--card); border:1px solid var(--card-border); border-radius: 100px;
+    padding: 7px 16px; font-size: 13px; font-weight:600; color: var(--muted);
+    display:flex; align-items:center; gap:6px;
+  }
+  .hud .pill b{color:var(--ink); font-weight:800;}
+  .timerwrap{ flex:1; height: 10px; background: rgba(255,255,255,.08); border-radius: 100px; overflow:hidden; margin: 0 12px; }
+  .timerbar{ height:100%; width:100%; background: linear-gradient(90deg, var(--a3), var(--a1)); border-radius:100px; transition: width 0.1s linear, background .3s ease; }
+
+  .qbanner{ display:flex; align-items:center; gap:10px; margin-bottom: 14px; color: var(--muted); font-size: 12px; font-weight:700; letter-spacing:.02em; }
+  .qbanner .icon{ width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,.06); }
+  .qbanner .icon svg{ width:18px; height:18px; }
+
+  .qcard{
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 20px;
+    padding: 24px 22px; margin-bottom: 18px; min-height: 84px; display:flex; align-items:center;
+  }
+  .qcard p{ margin:0; font-size: clamp(15.5px, 2.8vw, 19px); font-weight:700; line-height:1.4; }
+
+  .answers{ display:grid; grid-template-columns: 1fr; gap: 12px; }
+  @media(min-width:560px){ .answers{grid-template-columns: 1fr 1fr;} }
+
+  .ans-btn{
+    text-align:left; border:none; border-radius: 14px; padding: 16px 18px; font-size: 13.8px;
+    font-weight:600; color:white; cursor:pointer; display:flex; gap: 12px; align-items:flex-start;
+    line-height:1.35; transition: transform .1s ease, filter .15s ease, opacity .2s ease;
+  }
+  .ans-btn .shape{ flex-shrink:0; width: 20px; height:20px; border-radius:6px; background: rgba(255,255,255,.35); margin-top:1px; }
+  .ans-btn:hover{ filter: brightness(1.08); }
+  .ans-btn:active{ transform: scale(0.98); }
+  .ans-btn.c1{ background: #7c5cbf; }
+  .ans-btn.c2{ background: #2f9e8f; }
+  .ans-btn.c3{ background: #d9636b; }
+  .ans-btn.c4{ background: #3b7dd8; }
+  .ans-btn.correct{ background: var(--a3) !important; }
+  .ans-btn.wrong{ background: #4c5670 !important; opacity:.55; }
+  .ans-btn:disabled{ cursor:default; }
+
+  .feedback{ text-align:center; padding: 24px 10px 10px; }
+  .feedback .icon{ font-size: 44px; margin-bottom:6px; }
+  .feedback h2{ margin: 0 0 10px; font-size: 22px; }
+  .feedback .expl{
+    background: var(--card); border:1px solid var(--card-border); border-radius: 14px;
+    padding: 15px 18px; font-size: 13.5px; color: var(--muted); line-height:1.55; text-align:left; margin-bottom: 22px;
+  }
+  .feedback .expl b{color:var(--ink);}
+
+  .btn-primary{
+    background: var(--a1); color: #241a06; border:none; padding: 14px 30px; border-radius: 100px;
+    font-weight:800; font-size: 15px; cursor:pointer; transition: transform .1s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-2px); }
+  .btn-ghost{
+    background: transparent; border: 1px solid var(--card-border); color: var(--muted);
+    padding: 12px 24px; border-radius: 100px; font-size: 14px; cursor:pointer; margin-left: 10px;
+  }
+
+  .final{ text-align:center; padding: 20px 10px; }
+  .final .score-big{
+    font-size: 56px; font-weight: 900; margin: 6px 0 2px;
+    background: linear-gradient(90deg, var(--a1), var(--a2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .final .score-label{ color:var(--muted); font-size:14px; margin-bottom: 24px;}
+  .final .msg{ font-size:17px; font-weight:700; margin-bottom: 24px;}
+  .review-list{ text-align:left; margin: 0 0 28px; display:flex; flex-direction:column; gap:8px; max-height: 400px; overflow-y:auto; }
+  .review-item{
+    background: var(--card); border:1px solid var(--card-border); border-radius: 12px;
+    padding: 10px 14px; font-size: 12.5px; display:flex; gap:10px; align-items:flex-start; color: var(--muted);
+  }
+  .review-item.wrong{ border-color: rgba(217,99,107,.35); }
+  .review-item b{ color: var(--ink); }
+
+  .hidden{ display:none !important; }
+  .foot-note{ text-align:center; color: var(--muted); font-size: 11px; margin-top: 22px; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div id="menu" class="menu">
+    <h1>Parcial de <span>Anatomía</span></h1>
+    <p class="sub">Abdomen y Genitourinario — 183 preguntas en modo contrarreloj.</p>
+    <p class="author">Basado en el banco de preguntas de Pedro Toledo</p>
+    <div class="deck-grid">
+
+      <div class="deck-card a1" onclick="startGame('abdomen1')">
+        <span class="count">32</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--a1)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M12 5v14"/><path d="M4 12h16"/><circle cx="8" cy="8.5" r="1"/><circle cx="16" cy="15.5" r="1"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">ABDOMEN 1</span>
+          <h3>Huesos, músculos y peritoneo</h3>
+          <p>Vértebras, conducto inguinal, hiato de Winslow, fascias de coalescencia y dependencias peritoneales.</p>
+        </div>
+      </div>
+
+      <div class="deck-card a2" onclick="startGame('abdomen2')">
+        <span class="count">44</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--a2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10"/><path d="M7 13c0 3-2 4-2 7"/><path d="M17 13c0 3 2 4 2 7"/><path d="M12 13c0 3 0 4 0 7"/><circle cx="12" cy="4" r="1.4"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">ABDOMEN 2</span>
+          <h3>Aorta, intestino y colon</h3>
+          <p>Ramas de la aorta, tronco celíaco, arco de Riolano, compás de Wilkie y anastomosis mesentéricas.</p>
+        </div>
+      </div>
+
+      <div class="deck-card a3" onclick="startGame('abdomen3')">
+        <span class="count">47</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--a3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9c1-3 5-4.5 9-4 4 .5 7 3 7 6.5 0 3.8-3.6 6.5-8.5 6.5C7 18 3 15 4 9z"/><path d="M11 12.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M13 12.5c1.4 0 3-1 3-2.6"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">ABDOMEN 3</span>
+          <h3>Hígado, vías biliares, páncreas, bazo y riñón</h3>
+          <p>Pedículo hepático, triángulo de Calot, segmentos hepáticos, tronco celíaco y plexo solar.</p>
+        </div>
+      </div>
+
+      <div class="deck-card geni" onclick="startGame('geni')">
+        <span class="count">60</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--geni)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4c-2.5 1-3.5 3.3-3.5 5.5S7 14 7 16.5 5.5 20 5.5 20"/><path d="M15 4c2.5 1 3.5 3.3 3.5 5.5S16.5 14 16.5 16.5 18 20 18 20"/><circle cx="12" cy="6" r="2.4"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">GENITOURINARIO</span>
+          <h3>Riñón, uréter y aparato genital</h3>
+          <p>Fosita de Krause, pedículo renal, uretra, conducto eyaculador, fascias y vascularización pélvica.</p>
+        </div>
+      </div>
+
+      <div class="deck-card mix" onclick="startGame('todo')">
+        <span class="count">183</span>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M4 12h16"/></svg>
+        </div>
+        <div class="txt">
+          <span class="tag">REPASO TOTAL</span>
+          <h3>Las 183 preguntas mezcladas</h3>
+          <p>Todo el banco junto y al azar — la vuelta final antes del parcial.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="game" class="hidden">
+    <div class="hud">
+      <div class="pill">Pregunta <b id="qnum">1</b>/<span id="qtotal">12</span></div>
+      <div class="timerwrap"><div class="timerbar" id="timerbar"></div></div>
+      <div class="pill">🔥 <b id="streak">0</b></div>
+    </div>
+    <div class="qbanner"><div class="icon" id="qicon"></div><span id="qdecklabel">BLOQUE</span></div>
+    <div class="qcard"><p id="qtext">...</p></div>
+    <div class="answers" id="answers"></div>
+  </div>
+
+  <div id="feedback" class="hidden feedback">
+    <div class="icon" id="fbicon">✅</div>
+    <h2 id="fbtitle">¡Correcto!</h2>
+    <div class="expl" id="fbexpl"></div>
+    <button class="btn-primary" onclick="nextQuestion()">Siguiente →</button>
+  </div>
+
+  <div id="final" class="hidden final">
+    <div class="score-label">TU PUNTAJE</div>
+    <div class="score-big" id="finalscore">0/0</div>
+    <div class="msg" id="finalmsg"></div>
+    <div class="review-list" id="reviewlist"></div>
+    <button class="btn-primary" onclick="backToMenu()">Elegir otro bloque</button>
+    <button class="btn-ghost" onclick="startGame(currentDeck)">Repetir</button>
+  </div>
+
+  <div class="foot-note">⚠️ Preguntas y respuestas transcriptas del banco de Pedro Toledo. Los distractores (opciones incorrectas) fueron generados para el formato de juego — la respuesta correcta siempre corresponde al gabarito original.</div>
+</div>
+
+<script>
+const DECK_META = {
+  abdomen1: {label:"ABDOMEN 1 · Huesos, músculos y peritoneo"},
+  abdomen2: {label:"ABDOMEN 2 · Aorta, intestino y colon"},
+  abdomen3: {label:"ABDOMEN 3 · Hígado, vías biliares, páncreas, bazo y riñón"},
+  geni:     {label:"GENITOURINARIO"},
+  todo:     {label:"REPASO TOTAL"}
+};
+
+const DECKS = {
+  abdomen1: [
+    {q:"¿Cuáles son las vértebras lumbares atípicas?", a:["Músculo oblicuo interno y transverso del abdomen", "Fusión de las apófisis articulares de las vértebras sacras", "Trocánter menor del fémur", "L1 y L5"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Dónde se encuentra la apófisis mamilar?", a:["Entre la apófisis mamilar y la transversa", "Vena cava inferior", "Se encuentra por detrás de la apófisis articular superior", "Nervio Genitofemoral"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Dónde se encuentra la apófisis accesoria?", a:["Ligamento Inguinal", "El pasaje de las 3 aponeurosis que se dirigen delante del recto", "Promontorio", "Entre la apófisis mamilar y la transversa"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es el nombre del ángulo que determina la articulación entre la 5ª vértebra lumbar y el sacro?", a:["Se encuentra por detrás de la apófisis articular superior", "Fascia Retroduodenopancreática", "Vena cava inferior", "Promontorio"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿A qué nivel se termina la médula espinal?", a:["A nivel de L3-L4", "A nivel de T12-L1", "A nivel de L1-L2", "A nivel de S1-S2"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Qué sería la Cresta Sacra Intermedia?", a:["Fusión de las apófisis articulares de las vértebras sacras", "Aponeurosis del músculo oblicuo externo", "Primera porción del duodeno (Fascia de Treitz)", "Se encuentra por detrás de la apófisis articular superior"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cómo se llama la superficie articular del acetábulo?", a:["A nivel de L1-L2", "Carilla semilunar del acetábulo", "Promontorio", "Aponeurosis del músculo oblicuo externo"], c:1, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cómo se llama la unión de las aponeurosis de los músculos anchos?", a:["Vena cava inferior", "Línea Alba", "Ovario", "Promontorio"], c:1, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cómo se denomina el borde inferior de la aponeurosis del oblicuo externo?", a:["Aponeurosis del músculo oblicuo externo", "Entre la apófisis mamilar y la transversa", "Vena porta (pedículo hepático)", "Ligamento Inguinal"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cómo se denomina el borde lateral de la aponeurosis del músculo transverso?", a:["Línea semilunar de Spiegel", "Ligamento", "Tendón conjunto", "Aponeurosis del músculo oblicuo externo"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Qué músculo tiene como dependencia el ligamento inguinal?", a:["Ligamento inguinal", "Músculo oblicuo externo", "Vena cava inferior", "Fascia retrocólica ascendente (derecha)"], c:1, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Qué músculos forman el tendón conjunto?", a:["Fusión de las apófisis articulares de las vértebras sacras", "Vena porta (pedículo hepático)", "Músculo oblicuo interno y transverso del abdomen", "Lóbulo caudado del hígado"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Qué nervio perfora el músculo psoas mayor?", a:["Nervio Genitofemoral", "Fascia transversalis", "Epiplón", "Tendón conjunto"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Dónde se inserta el músculo iliopsoas?", a:["Entre la apófisis mamilar y la transversa", "Línea semilunar de Spiegel", "Meso", "Trocánter menor del fémur"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Qué señala el Arco de Douglas?", a:["El pasaje de las 3 aponeurosis que se dirigen delante del recto", "Fascia de Treitz", "Músculo oblicuo externo", "Fusión de las apófisis articulares de las vértebras sacras"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es la pared inferior del conducto inguinal?", a:["Ligamento inguinal", "Entre la apófisis mamilar y la transversa", "Se encuentra por detrás de la apófisis articular superior", "Ligamento"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es la pared superior del conducto inguinal?", a:["Meso", "Ligamento inguinal", "Tendón conjunto", "Vena cava inferior"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"El borde inferior de qué músculo forma el ligamento inguinal?", a:["Tendón conjunto", "Ligamento Inguinal", "Vena porta (pedículo hepático)", "Músculo oblicuo externo"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es la pared posterior del conducto inguinal?", a:["Fascia transversalis", "Vena cava inferior", "Ovario", "Ligamento"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es la pared anterior del conducto inguinal?", a:["Músculo oblicuo interno y transverso del abdomen", "Ligamento", "Epiplón", "Aponeurosis del músculo oblicuo externo"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es el límite posterior del hiato de Winslow?", a:["Fusión de las apófisis articulares de las vértebras sacras", "Meso", "Vena cava inferior", "Promontorio"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es la dependencia peritoneal que une órgano a pared y posee vasos?", a:["Meso", "Línea semilunar de Spiegel", "A nivel de L1-L2", "Fascia de Treitz"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es el único órgano intraperitoneal?", a:["Primera porción del duodeno (Fascia de Treitz)", "Fascia retrocólica ascendente (derecha)", "Ligamento inguinal", "Ovario"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es la dependencia que une órgano a órgano o a pared y no posee vasos?", a:["Ligamento", "Fascia transversalis", "Ligamento Inguinal", "Nervio Genitofemoral"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es el límite anterior del hiato de Winslow?", a:["Ligamento", "Trocánter menor del fémur", "Vena porta (pedículo hepático)", "Músculo oblicuo interno y transverso del abdomen"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál dependencia peritoneal une el estómago al colon transverso?", a:["A nivel de L1-L2", "Ligamento gastrocólico (Epiplón mayor)", "Fusión de las apófisis articulares de las vértebras sacras", "Entre la apófisis mamilar y la transversa"], c:1, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Qué fascia de Coalescencia se forma por detrás del duodeno y de la cabeza del páncreas?", a:["Fascia de Treitz", "Ligamento inguinal", "Fascia Retroduodenopancreática", "L1 y L5"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es el límite superior del hiato de Winslow?", a:["Lóbulo caudado del hígado", "L1 y L5", "Trocánter menor del fémur", "A nivel de L1-L2"], c:0, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"La fascia de Treitz corresponde a qué fascia de coalescencia?", a:["Primera porción del duodeno (Fascia de Treitz)", "Ligamento", "A nivel de L1-L2", "Fascia Retroduodenopancreática"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál es el límite inferior del hiato de Winslow?", a:["Nervio Genitofemoral", "Promontorio", "Primera porción del duodeno (Fascia de Treitz)", "Ligamento inguinal"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"¿Cuál dependencia peritoneal une órgano a órgano y contiene vasos?", a:["Carilla semilunar del acetábulo", "El pasaje de las 3 aponeurosis que se dirigen delante del recto", "Epiplón", "Entre la apófisis mamilar y la transversa"], c:2, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+    {q:"La fascia de Toldt 2 corresponde a qué dependencia peritoneal?", a:["Vena cava inferior", "Promontorio", "Se encuentra por detrás de la apófisis articular superior", "Fascia retrocólica ascendente (derecha)"], c:3, e:"Abdomen 1 · Huesos, músculos y peritoneo."},
+  ],
+  abdomen2: [
+    {q:"¿Qué arterias se originan a partir de la bifurcación de la arteria aorta abdominal?", a:["Anastomosis de la arteria rectal superior + 3ª (última) arteria sigmoidea", "Cara posterior del fundus y cardias", "Arteria ilíaca interna", "Ilíacas comunes (derecha e izquierda)"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿A qué nivel termina la Arteria Aorta Abdominal?", a:["L3", "L1", "L4", "L2"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuáles son las ramas colaterales parietales de la aorta?", a:["Arteria ilíaca interna", "Arteria mesentérica inferior", "Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica", "Frénicas inferiores, lumbares y sacra media"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuáles son las ramas colaterales viscerales impares de la aorta?", a:["Anastomosis entre la rama derecha de la cólica izquierda con la rama izquierda de la cólica media", "Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica", "Arteria frénica inferior", "Tronco celíaco, mesentérica superior y mesentérica inferior"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuáles son las ramas colaterales viscerales pares de la aorta?", a:["Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica", "Suprarrenal media, renales y gonadales", "Arteria aorta abdominal", "Arteria umbilical"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo está formado el tronco de Henle?", a:["Arteria ilíaca interna", "Vena cólica derecha + vena gastroepiploica derecha", "Arteria rectal superior", "Arteria gástrica izquierda, esplénica y hepática común"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo está compuesto el ángulo de Hiz?", a:["Porción final del esófago + porción inicial del estómago", "Arteria rectal superior", "Vena cólica derecha + vena gastroepiploica derecha", "Arteria frénica inferior"], c:0, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿En qué parte del estómago se encuentra el área desnuda?", a:["Entre las hojas del ligamento gastrofrénico", "Cara posterior del fundus y cardias", "Aorta abdominal", "Arteria mesentérica inferior"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La Arteria Gástrica Izquierda es rama de quién?", a:["Por la arteria cólica izquierda y la vena mesentérica inferior", "Arteria cística", "Tronco celíaco", "Vena mesentérica superior"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria Gástrica Derecha es rama de qué arteria?", a:["L4", "Arteria hepática propia", "Arteria mesentérica inferior", "Arteria ilíaca externa"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Dónde desembocan las venas gástricas?", a:["Arteria mesentérica inferior", "Vena renal izquierda, tercera porción del duodeno y apófisis unciforme del páncreas", "Arteria ilíaca interna", "Vena porta"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo está formada el área desnuda del estómago?", a:["Vena mesentérica superior", "Aorta abdominal", "Entre las hojas del ligamento gastrofrénico", "Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Dónde es considerado el Hilio del estómago?", a:["Ilíacas comunes (derecha e izquierda)", "Arteria mesentérica inferior", "Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica", "Curvatura menor"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Dónde desemboca el tronco de Henle?", a:["Vena mesentérica superior", "Curvatura menor", "Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica", "Arteria pancreatoduodenal anterosuperior y gastroepiploica derecha"], c:0, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuáles son las ramas del tronco celíaco?", a:["Vena cólica derecha + vena gastroepiploica derecha", "Arteria gástrica izquierda, esplénica y hepática común", "Arteria cística", "Anastomosis entre la rama derecha de la cólica izquierda con la rama izquierda de la cólica media"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria suprarrenal media es rama de qué arteria?", a:["Aorta abdominal", "L4", "Tronco celíaco", "Vena porta"], c:0, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo está formada el área vascular de Treitz?", a:["Arteria mesentérica inferior", "Por la arteria cólica izquierda y la vena mesentérica inferior", "Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica", "Arteria hepática propia"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria ilíaca común es rama terminal de qué arteria?", a:["Ilíacas comunes (derecha e izquierda)", "Arteria aorta abdominal", "Porción final del esófago + porción inicial del estómago", "L4"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria epigástrica inferior es rama de qué arteria?", a:["L4", "Arteria ilíaca externa", "Por la arteria cólica izquierda y la vena mesentérica inferior", "Vena mesentérica superior"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuál es la rama terminal de la arteria ilíaca externa?", a:["15 cm", "Arteria renal", "Arteria femoral", "Por la arteria cólica izquierda y la vena mesentérica inferior"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria suprarrenal superior es rama de qué arteria?", a:["Arteria mesentérica inferior", "Arteria frénica inferior", "Anastomosis entre la rama derecha de la cólica izquierda con la rama izquierda de la cólica media", "15 cm"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria suprarrenal media es rama de qué arteria?", a:["Arteria hepática propia", "Arteria rectal superior", "Anastomosis de la arteria rectal superior + 3ª (última) arteria sigmoidea", "Aorta abdominal"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria suprarrenal inferior es rama de qué arteria?", a:["Arteria hepática propia", "Arteria renal", "Entre las hojas del ligamento gastrofrénico", "Ilíacas comunes (derecha e izquierda)"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria vesical superior es rama de qué arteria?", a:["Arteria pudenda interna", "Tronco celíaco, mesentérica superior y mesentérica inferior", "Arteria umbilical", "Arteria frénica inferior"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria rectal superior es rama terminal de qué arteria?", a:["Curvatura menor", "Aorta abdominal", "Arteria aorta abdominal", "Arteria mesentérica inferior"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria rectal media es rama de qué arteria?", a:["L4", "Arteria ilíaca interna", "Arteria pudenda interna", "Suprarrenal media, renales y gonadales"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuáles son las ramas terminales de la arteria gastroduodenal?", a:["Arteria aorta abdominal", "Arteria pancreatoduodenal anterosuperior y gastroepiploica derecha", "Vena renal izquierda, tercera porción del duodeno y apófisis unciforme del páncreas", "Conducto colédoco + conducto pancreático principal de Wirsung; desemboca en la carúncula mayor del duodeno"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria hepática derecha origina qué arteria?", a:["Por la arteria cólica izquierda y la vena mesentérica inferior", "Arteria cística", "Arteria pudenda interna", "Arteria rectal superior"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La Arteria Gástrica Derecha es rama de qué arteria?", a:["Cara posterior del fundus y cardias", "Arteria hepática propia", "Tercera (3ª) porción del duodeno", "Arteria cística"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"El compás de Wilkie se encuentra en qué porción del duodeno?", a:["Segunda porción del duodeno", "Tercera (3ª) porción del duodeno", "Cuarta porción del duodeno", "Primera porción del duodeno"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"El colon izquierdo está irrigado por qué arteria?", a:["Arteria mesentérica inferior", "Cara posterior del fundus y cardias", "Arteria femoral", "Vena mesentérica superior"], c:0, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"El colon derecho está irrigado por qué arteria?", a:["Arteria hepática propia", "Por la arteria cólica izquierda y la vena mesentérica inferior", "Arteria mesentérica superior", "Tronco celíaco"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Qué estructuras hacen parte de la Pinza vascular aorticomesentérica (compás de Wilkie)?", a:["Mesos, epiplones, ligamentos y fascia de coalescencia", "Vena porta", "Vena renal izquierda, tercera porción del duodeno y apófisis unciforme del páncreas", "Arteria pancreatoduodenal anterosuperior y gastroepiploica derecha"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿El Duodeno está relacionado anteriormente con el riñón izquierdo?", a:["Verdadero", "Falso"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo se forma el arco de Riolano?", a:["Arteria pancreatoduodenal anterosuperior y gastroepiploica derecha", "Conducto colédoco + conducto pancreático principal de Wirsung; desemboca en la carúncula mayor del duodeno", "Anastomosis entre la rama derecha de la cólica izquierda con la rama izquierda de la cólica media", "Arteria renal"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo se forma el espacio avascular de Treves?", a:["Arteria mesentérica inferior", "Vena cólica derecha + vena gastroepiploica derecha", "Arteria frénica inferior", "Anastomosis de la última arteria ileal con la rama ileal de la arteria ileocólica"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"Las arterias yeyunoileales son ramas de qué arteria?", a:["Arteria mesentérica superior", "Vena renal izquierda, tercera porción del duodeno y apófisis unciforme del páncreas", "Arteria ilíaca interna", "L4"], c:0, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"Cite las dependencias peritoneales", a:["Cara posterior del fundus y cardias", "Suprarrenal media, renales y gonadales", "Mesos, epiplones, ligamentos y fascia de coalescencia", "Conducto colédoco + conducto pancreático principal de Wirsung; desemboca en la carúncula mayor del duodeno"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo se forma la ampolla de Vater y dónde desemboca?", a:["Arteria aorta abdominal", "Conducto colédoco + conducto pancreático principal de Wirsung; desemboca en la carúncula mayor del duodeno", "Frénicas inferiores, lumbares y sacra media", "Por la arteria cólica izquierda y la vena mesentérica inferior"], c:1, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuál es la rama terminal de la arteria mesentérica inferior?", a:["Arteria rectal superior", "Arteria pancreatoduodenal anterosuperior y gastroepiploica derecha", "Por la arteria cólica izquierda y la vena mesentérica inferior", "Tercera (3ª) porción del duodeno"], c:0, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cómo está conformado el punto crítico de Sudeck?", a:["Arteria frénica inferior", "Arteria aorta abdominal", "Vena cólica derecha + vena gastroepiploica derecha", "Anastomosis de la arteria rectal superior + 3ª (última) arteria sigmoidea"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"La arteria rectal inferior es rama de qué arteria?", a:["Tercera (3ª) porción del duodeno", "Arteria aorta abdominal", "Suprarrenal media, renales y gonadales", "Arteria pudenda interna"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuál es la primera rama de la aorta abdominal?", a:["Vena cólica derecha + vena gastroepiploica derecha", "Arteria gástrica izquierda, esplénica y hepática común", "Por la arteria cólica izquierda y la vena mesentérica inferior", "Arterias frénicas inferiores"], c:3, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+    {q:"¿Cuánto mide la raíz del mesenterio?", a:["20 cm", "10 cm", "15 cm", "8 cm"], c:2, e:"Abdomen 2 · Aorta, intestino, duodeno, estómago, colon y recto."},
+  ],
+  abdomen3: [
+    {q:"La arteria Gastroepiploica izquierda es rama de quién?", a:["Arteria cística", "Arteria Cística", "Arteria esplénica", "Unión del nervio vago derecho, nervio esplácnico mayor derecho y ganglio semilunar derecho"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"La arteria Gastroduodenal es rama de quién?", a:["Esofágicas, rectales, paraumbilicales y retroperitoneales", "Detrás del cuello del páncreas", "Vena esplénica", "Arteria hepática común"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Cite los músculos que se relacionan posteriormente con los riñones", a:["Diafragma, psoas mayor, cuadrado lumbar y transverso del abdomen", "Segmento V", "Nervios esplácnicos mayor, menor e inferior", "Arteria gástrica izquierda"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Dónde terminan las venas renales?", a:["Arteria cística", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)", "Vena cava inferior", "Segmento II"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"El estómago deja una impresión en el bazo y en el hígado", a:["Verdadero", "Falso"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Quién se encarga de hacer la irrigación funcional del hígado?", a:["Vena porta hepática", "Arteria hepática común", "Arteria esplénica", "Diafragma, psoas mayor, cuadrado lumbar y transverso del abdomen"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Quién se encarga de hacer la irrigación nutricia del hígado?", a:["Arteria hepática propia", "Arteria gástrica izquierda, arteria esplénica y arteria hepática común", "L1 - L2", "Origen de la arteria mesentérica superior"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el elemento más posterior del pedículo hepático?", a:["Concavidad del ganglio semilunar derecho", "Vena porta hepática", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)", "Arteria pancreatoduodenal posterosuperior"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el diámetro del conducto colédoco?", a:["10 mm", "6 mm", "15 mm", "3 mm"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el contenido del cuadrilátero venoso de Rogie?", a:["Segmento V", "Arteria pancreatoduodenal posterosuperior", "Origen de la arteria mesentérica superior", "Venas frénicas inferiores y venas lumbares"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Cite las anastomosis porto cava", a:["Segmento V", "Esofágicas, rectales, paraumbilicales y retroperitoneales", "Arteria esplénica", "Vena porta hepática"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Cite las afluentes parietales de la vena cava inferior", a:["Venas frénicas inferiores y venas lumbares", "Vena cava inferior", "Arteria hepática propia", "Nervio Vago"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"La vena porta se forma a través de cuáles venas?", a:["Arteria gástrica izquierda, arteria esplénica y arteria hepática común", "Vena porta hepática, arteria hepática propia y conducto colédoco", "Ligamento redondo del hígado", "Vena mesentérica superior y vena esplénica"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿A qué nivel se forma la Vena porta?", a:["L1 - L2", "Arteria cística", "Vena mesentérica superior y vena esplénica", "Detrás del cuello del páncreas"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el segmento posterior lateral izquierdo del hígado?", a:["Segmento II", "Segmento I", "Segmento IV", "Segmento III"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es la fascia Preduodenopancreática?", a:["Diafragma, psoas mayor, cuadrado lumbar y transverso del abdomen", "Fascia de Fredet", "Arteria gástrica izquierda", "Arteria gástrica izquierda, arteria esplénica y arteria hepática común"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Qué estructura está anterior y a la izquierda del pedículo hepático?", a:["Unión del conducto colédoco y el conducto pancreático principal", "Unión del nervio esplácnico mayor izquierdo con el ganglio semilunar izquierdo", "Arteria esplénica", "Arteria hepática propia"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Cite las ramas colaterales de la arteria renal", a:["Segmento II", "Arteria suprarrenal inferior, ramas ureterales y capsuloadiposas", "Ligamento Coronario", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"La Arteria Cística es rama de quién?", a:["Arteria hepática propia", "Arteria hepática derecha", "Vena esplénica", "Venas frénicas inferiores y venas lumbares"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Cite las ramas del tronco celíaco", a:["Arteria pancreatoduodenal posterosuperior", "Arteria gástrica izquierda, arteria esplénica y arteria hepática común", "Arteria gástrica izquierda", "Arteria hepática común"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el límite superior del cuadrilátero venoso de Rogie?", a:["Vena esplénica", "Nervios esplácnicos mayor, menor e inferior", "Vena mesentérica inferior", "Arteria hepática propia"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el contenido del triángulo de Calot?", a:["Arteria pancreática dorsal", "Arteria cística", "Venas frénicas inferiores y venas lumbares", "Impresión gástrica, renal y cólica"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Cite los componentes del pedículo hepático", a:["Diafragma, psoas mayor, cuadrado lumbar y transverso del abdomen", "Vena porta hepática, arteria hepática propia y conducto colédoco", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)", "Segmento V"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál rama del tronco celíaco irriga el estómago?", a:["Nervios esplácnicos mayor, menor e inferior", "Conducto cístico", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)", "Arteria gástrica izquierda"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Qué arteria del páncreas se encuentra en la región medial?", a:["Arteria pancreática dorsal", "Diafragma, psoas mayor, cuadrado lumbar y transverso del abdomen", "Arteria hepática común", "Arteria hepática propia"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cómo se forma el asa de Laignel-Lavastine?", a:["6 mm", "L1 - L2", "Unión del conducto colédoco y el conducto pancreático principal", "Unión del nervio esplácnico mayor izquierdo con el ganglio semilunar izquierdo"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Cite las impresiones de la cara visceral del lóbulo derecho del hígado", a:["Concavidad del ganglio semilunar derecho", "Impresión cólica, renal, duodenal y suprarrenal", "Segmento V", "Arteria hepática derecha"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cómo se forma el conducto colédoco?", a:["Unión de la vena gastroepiploica derecha y la vena cólica derecha", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)", "Vena porta hepática", "Unión del conducto hepático común y el conducto cístico"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cómo se forma la ampolla hepatopancreática de Vater?", a:["10ª costilla", "Vena porta hepática", "Unión del conducto colédoco y el conducto pancreático principal", "Arteria gástrica izquierda, arteria esplénica y arteria hepática común"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Qué arteria le da el brazo al conducto colédoco?", a:["Ligamento Coronario", "Arteria pancreatoduodenal posterosuperior", "Arteria suprarrenal inferior, ramas ureterales y capsuloadiposas", "Unión de la vena gastroepiploica derecha y la vena cólica derecha"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es la arteria encargada de irrigar a la vía biliar secundaria?", a:["Diafragma, psoas mayor, cuadrado lumbar y transverso del abdomen", "Arteria cística", "Arteria Cística", "10ª costilla"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es la única porción peritonizada y móvil del páncreas?", a:["Arteria pancreática dorsal", "Cola del páncreas", "Ligamento Coronario", "Arteria gástrica izquierda, arteria esplénica y arteria hepática común"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿A qué nivel vertebral se encuentra el páncreas?", a:["L3-L4", "L2-L3", "T12-L1", "L1 - L2"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cómo se forma el tronco venoso gastrocólico de Henle?", a:["Unión de la vena gastroepiploica derecha y la vena cólica derecha", "6 mm", "Vena esplénica", "Impresión gástrica, renal y cólica"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es la costilla satélite del bazo?", a:["10ª costilla", "8ª costilla", "11ª costilla", "9ª costilla"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuáles son las impresiones de la cara visceral del bazo?", a:["Origen de la arteria mesentérica superior", "Impresión gástrica, renal y cólica", "Unión del nervio vago derecho, nervio esplácnico mayor derecho y ganglio semilunar derecho", "L1 - L2"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuáles son las ramas terminales de la arteria esplénica?", a:["Arteria hepática común", "Unión de la vena gastroepiploica derecha y la vena cólica derecha", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)", "Arteria cística"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿De dónde provienen las fibras aferentes simpáticas del plexo solar?", a:["Fascia de Fredet", "Unión del conducto hepático común y el conducto cístico", "Nervios esplácnicos mayor, menor e inferior", "Vena esplénica"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Dónde termina la rama abdominal del nervio frénico derecho?", a:["Arteria gástrica izquierda, arteria esplénica y arteria hepática común", "Venas frénicas inferiores y venas lumbares", "Concavidad del ganglio semilunar derecho", "Ramas superior (gástricas cortas) e inferior (gastroepiploica izquierda)"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cómo se forma el asa memorable de Wrisberg?", a:["Unión del nervio vago derecho, nervio esplácnico mayor derecho y ganglio semilunar derecho", "Impresión cólica, renal, duodenal y suprarrenal", "Origen de la arteria mesentérica superior", "Arteria suprarrenal inferior, ramas ureterales y capsuloadiposas"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el límite inferior del triángulo de Calot?", a:["Conducto cístico", "Arteria hepática común", "Vena mesentérica superior y vena esplénica", "Arteria esplénica"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Cuál es el límite izquierdo del cuadrilátero venoso de Rogie?", a:["Vena mesentérica inferior", "Vena porta hepática, arteria hepática propia y conducto colédoco", "Unión del conducto colédoco y el conducto pancreático principal", "Venas frénicas inferiores y venas lumbares"], c:0, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Qué ligamento del hígado NO es dependencia del peritoneo?", a:["Arteria pancreática dorsal", "Origen de la arteria mesentérica superior", "Arteria gástrica izquierda", "Ligamento redondo del hígado"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"El lóbulo de Spiegel corresponde a qué segmento en el hígado?", a:["Segmento II", "Segmento IV", "Segmento I", "Segmento VIII"], c:2, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"El segmento anteromedial derecho corresponde a qué segmento hepático?", a:["Segmento VIII", "Segmento IV", "Segmento VI", "Segmento V"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"¿Qué ligamento del hígado delimita el área desnuda?", a:["Impresión cólica, renal, duodenal y suprarrenal", "Ligamento Coronario", "Arteria gástrica izquierda, arteria esplénica y arteria hepática común", "Vena porta hepática"], c:1, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+    {q:"Las fibras parasimpáticas del plexo solar provienen principalmente de qué nervio?", a:["Arteria Cística", "Vena esplénica", "Impresión cólica, renal, duodenal y suprarrenal", "Nervio Vago"], c:3, e:"Abdomen 3 · Hígado, vía biliar, páncreas, bazo y riñón."},
+  ],
+  geni: [
+    {q:"¿Cómo se llama el vértice del riñón?", a:["Estrechamiento pieloureteral (origen), estrechamiento ilíaco (en los vasos ilíacos) y estrechamiento intramural (terminación)", "Arteria epigástrica inferior", "Papila renal", "Fascia transversalis"], c:2, e:"Genitourinario."},
+    {q:"¿Cómo está formado el conducto eyaculador?", a:["Unión del conducto deferente con el conducto de la vesícula seminal", "Cara anterior del istmo y cuello, bordes laterales y porción vaginal del cuello uterino", "La arteria uterina pasa medial y arriba de los uréteres, como un puente sobre el río", "Arteria Cremastérica, Deferencial y testicular"], c:0, e:"Genitourinario."},
+    {q:"¿A qué nivel desemboca el conducto eyaculador?", a:["Unión del conducto deferente con el conducto de la vesícula seminal", "Ambos lados del colículo seminal en la uretra prostática", "Vena Safena Magna", "Termina a nivel del polo inferior del riñón, donde se continúa como uréter"], c:1, e:"Genitourinario."},
+    {q:"¿En cuál porción de la trompa uterina ocurre la fecundación?", a:["Trompa uterina (mesosalpinx)", "Ampolla de la trompa uterina", "Prostática, Bulbar y balánica", "Fascia transversalis"], c:1, e:"Genitourinario."},
+    {q:"Según la Ley de Luschka, el uréter derecho cruza por delante de la terminación de la arteria ilíaca común", a:["Verdadero", "Falso"], c:1, e:"Genitourinario."},
+    {q:"La fascia espermática interna es dependencia de quién?", a:["Vena cava inferior", "Arteria uterina", "Arteria epigástrica inferior", "Fascia transversalis"], c:3, e:"Genitourinario."},
+    {q:"La fascia cremastérica es dependencia de quién?", a:["Músculo oblicuo interno", "Aorta abdominal", "Túnica albugínea", "Arteria ovárica"], c:0, e:"Genitourinario."},
+    {q:"¿A qué corresponde el pliegue superior del ligamento ancho del útero?", a:["Vena cava inferior", "Trompa uterina (mesosalpinx)", "Porción pelviana y porción perineal", "Porción esponjosa de la uretra masculina"], c:1, e:"Genitourinario."},
+    {q:"¿Cuál es el límite anterior de la fosita de Krause?", a:["Arteria ilíaca interna", "Arteria ovárica", "Ligamento ancho del útero", "Fascia/Tabique Interrenosuprarrenal"], c:2, e:"Genitourinario."},
+    {q:"¿Cuál es el límite inferior de la fosita de Krause?", a:["Arteria umbilical", "Fascia transversalis", "Túnica albugínea", "Vena cava inferior"], c:0, e:"Genitourinario."},
+    {q:"La arteria deferencial es rama de qué arteria?", a:["Arteria umbilical", "Pelvis renal", "Fascia/Tabique Interrenosuprarrenal", "Arteria ilíaca externa"], c:0, e:"Genitourinario."},
+    {q:"La arteria vesical superior es rama de qué arteria?", a:["Ovario", "Fascia/Tabique Interrenosuprarrenal", "Arteria umbilical", "6 a 8 mm"], c:2, e:"Genitourinario."},
+    {q:"¿Cuál es el diámetro de los uréteres?", a:["2 a 4 mm", "6 a 8 mm", "1 a 2 mm", "10 a 12 mm"], c:1, e:"Genitourinario."},
+    {q:"La fascia espermática externa es dependencia de quién?", a:["La arteria uterina pasa medial y arriba de los uréteres, como un puente sobre el río", "Aponeurosis del músculo oblicuo externo del abdomen", "Músculo oblicuo interno del abdomen", "Porción abdominal, porción pélvica y porción intramural"], c:1, e:"Genitourinario."},
+    {q:"Profundo a la túnica vaginal está la:", a:["Porción esponjosa de la uretra masculina", "Túnica albugínea", "Unión del conducto deferente con el conducto de la vesícula seminal", "Aorta abdominal"], c:1, e:"Genitourinario."},
+    {q:"¿Por cuál plexo principalmente están inervados los órganos de la pelvis?", a:["Vestíbulo Vaginal", "Arteria pudenda interna", "18 gramos aproximadamente", "Plexo hipogástrico inferior"], c:3, e:"Genitourinario."},
+    {q:"¿Cuál es el único órgano de la región pélvica que no está inervado por el Plexo Hipogástrico inferior?", a:["Músculo oblicuo interno del abdomen", "Arteria umbilical", "Ovario", "Fascia profunda del pene"], c:2, e:"Genitourinario."},
+    {q:"El uréter derecho es más inferior al uréter izquierdo", a:["Verdadero", "Falso"], c:0, e:"Genitourinario."},
+    {q:"¿Qué nervio pasa por la fosita de Krause?", a:["Nervio obturador", "18 gramos aproximadamente", "Porción abdominal, porción pélvica y porción intramural", "Porción preprostática (intramural), porción prostática, porción membranosa y porción esponjosa"], c:0, e:"Genitourinario."},
+    {q:"La arteria epigástrica inferior es rama de qué arteria?", a:["Arteria ilíaca externa", "Unión del conducto deferente con el conducto de la vesícula seminal", "Arteria umbilical", "Ambos lados del colículo seminal en la uretra prostática"], c:0, e:"Genitourinario."},
+    {q:"Cite las porciones del uréter", a:["Papila renal", "Arteria uterina", "Por la arteria pudenda interna", "Porción abdominal, porción pélvica y porción intramural"], c:3, e:"Genitourinario."},
+    {q:"¿Cuáles son las porciones de la uretra femenina?", a:["Trompa uterina (mesosalpinx)", "Arteria ilíaca externa", "Porción pelviana y porción perineal", "Pelvis renal"], c:2, e:"Genitourinario."},
+    {q:"La arteria dorsal del clítoris es rama de qué arteria?", a:["Vasos ilíacos externos", "Desembocadura de los 2 uréteres y el orificio interno de la uretra", "Arteria pudenda interna", "Trompa uterina (mesosalpinx)"], c:2, e:"Genitourinario."},
+    {q:"Cerca del 20% del semen es producido por la próstata", a:["Verdadero", "Falso"], c:0, e:"Genitourinario."},
+    {q:"La arteria Cremastérica es rama de quién?", a:["Nervio obturador", "Papila renal", "Arteria umbilical", "Arteria epigástrica inferior"], c:3, e:"Genitourinario."},
+    {q:"La arteria vesical inferior es rama de quién?", a:["Arteria umbilical", "Arteria ilíaca interna", "Termina a nivel del polo inferior del riñón, donde se continúa como uréter", "Porción abdominal, porción pélvica y porción intramural"], c:1, e:"Genitourinario."},
+    {q:"¿Cuál es la relación del uréter con la arteria uterina?", a:["La arteria uterina pasa medial y arriba de los uréteres, como un puente sobre el río", "Fascia transversalis", "Arteria epigástrica inferior", "Trompa uterina (mesosalpinx)"], c:0, e:"Genitourinario."},
+    {q:"La arteria Uterina es rama de quién?", a:["Papila renal", "Nervio obturador", "12ª costilla", "Arteria ilíaca interna"], c:3, e:"Genitourinario."},
+    {q:"¿Qué estructura delimita los labios menores de la vagina?", a:["Porción pelviana y porción perineal", "Vestíbulo Vaginal", "Arteria ilíaca interna", "Peritoneo"], c:1, e:"Genitourinario."},
+    {q:"La función eréctil del pene depende de la inervación simpática", a:["Verdadero", "Falso"], c:1, e:"Genitourinario. Es de la parasimpática."},
+    {q:"¿Qué corresponde al pliegue posterior del ligamento ancho?", a:["Ligamento propio del ovario", "Fascia/Tabique Interrenosuprarrenal", "Arteria ilíaca externa", "Unión del conducto deferente con el conducto de la vesícula seminal"], c:0, e:"Genitourinario."},
+    {q:"El músculo cremáster es dependencia de quién?", a:["Músculo oblicuo interno del abdomen", "Ampolla de la trompa uterina", "Unión del conducto deferente con el conducto de la vesícula seminal", "Plexo hipogástrico inferior"], c:0, e:"Genitourinario."},
+    {q:"¿Cuál es el peso de la próstata?", a:["30 gramos aproximadamente", "50 gramos aproximadamente", "8 gramos aproximadamente", "18 gramos aproximadamente"], c:3, e:"Genitourinario."},
+    {q:"¿Cuáles son las porciones masculinas de la uretra?", a:["Arteria Cremastérica, Deferencial y testicular", "Porción preprostática (intramural), porción prostática, porción membranosa y porción esponjosa", "Ligamento propio del ovario", "Estrechamiento pieloureteral (origen), estrechamiento ilíaco (en los vasos ilíacos) y estrechamiento intramural (terminación)"], c:1, e:"Genitourinario."},
+    {q:"La arteria testicular es rama de quién?", a:["Aorta abdominal", "La arteria uterina pasa medial y arriba de los uréteres, como un puente sobre el río", "Plexo venoso de Santorini", "16 cm aproximadamente"], c:0, e:"Genitourinario."},
+    {q:"¿Cuáles arterias hacen parte de la anastomosis de las 3 vías de Jarisch?", a:["Papila renal", "Plexo hipogástrico inferior", "Arteria pudenda interna", "Arteria Cremastérica, Deferencial y testicular"], c:3, e:"Genitourinario."},
+    {q:"El conjunto de cálices mayores forma:", a:["Arteria epigástrica inferior", "Anteversoflexión", "Pelvis renal", "Plexo hipogástrico inferior"], c:2, e:"Genitourinario."},
+    {q:"La túnica vaginal es dependencia de quién?", a:["Vena Safena Magna", "Nervio obturador", "Peritoneo", "Porción abdominal, porción pélvica y porción intramural"], c:2, e:"Genitourinario."},
+    {q:"Las ramas tubáricas laterales son ramas de quién?", a:["Túnica albugínea", "Arteria ovárica", "Vena renal, arteria renal y pelvis renal", "Nervio obturador"], c:1, e:"Genitourinario."},
+    {q:"Las ramas tubáricas mediales son ramas de qué arteria?", a:["12ª costilla", "6 a 8 mm", "18 gramos aproximadamente", "Arteria uterina"], c:3, e:"Genitourinario."},
+    {q:"La arteria dorsal del pene es rama de qué arteria?", a:["12ª costilla", "Aorta abdominal", "6 a 8 mm", "Arteria pudenda interna"], c:3, e:"Genitourinario."},
+    {q:"¿Cuáles son las zonas desprovistas de peritoneo en el útero?", a:["Túnica albugínea", "Cara anterior del istmo y cuello, bordes laterales y porción vaginal del cuello uterino", "Arteria Cremastérica, Deferencial y testicular", "18 gramos aproximadamente"], c:1, e:"Genitourinario."},
+    {q:"¿Cuál es el límite superior de la fosita de Krause?", a:["Aponeurosis del músculo oblicuo externo del abdomen", "La arteria uterina pasa medial y arriba de los uréteres, como un puente sobre el río", "Vasos ilíacos externos", "Músculo oblicuo interno"], c:2, e:"Genitourinario."},
+    {q:"¿Cuál es el límite posterior de la fosita de Krause?", a:["Vasos ilíacos internos y uréter", "Arteria epigástrica inferior", "Ambos lados del colículo seminal en la uretra prostática", "Estrechamiento pieloureteral (origen), estrechamiento ilíaco (en los vasos ilíacos) y estrechamiento intramural (terminación)"], c:0, e:"Genitourinario."},
+    {q:"¿Qué estructura se encarga de separar el riñón de la glándula suprarrenal?", a:["Aponeurosis del músculo oblicuo externo del abdomen", "Arteria Cremastérica, Deferencial y testicular", "Trompa uterina (mesosalpinx)", "Fascia/Tabique Interrenosuprarrenal"], c:3, e:"Genitourinario."},
+    {q:"La hoja posterior de la fascia renal corresponde a la Fascia de Gerota", a:["Verdadero", "Falso"], c:1, e:"Genitourinario."},
+    {q:"La fascia de Buck corresponde a qué envoltura del pene?", a:["Músculo oblicuo interno", "Porción preprostática (intramural), porción prostática, porción membranosa y porción esponjosa", "Vestíbulo Vaginal", "Fascia profunda del pene"], c:3, e:"Genitourinario."},
+    {q:"¿Cómo es hecha principalmente la vascularización del clítoris?", a:["Anteversoflexión", "Por la arteria pudenda interna", "Músculo oblicuo interno del abdomen", "Vestíbulo Vaginal"], c:1, e:"Genitourinario."},
+    {q:"¿Cuál es la costilla satélite de los riñones?", a:["9ª costilla", "10ª costilla", "11ª costilla", "12ª costilla"], c:3, e:"Genitourinario."},
+    {q:"De adelante hacia atrás, ¿cómo está conformado el pedículo renal?", a:["Ligamento propio del ovario", "Plexo hipogástrico inferior", "Vena renal, arteria renal y pelvis renal", "Vasos ilíacos externos"], c:2, e:"Genitourinario."},
+    {q:"¿Dónde y cómo termina la pelvis renal?", a:["Peritoneo", "Ligamento propio del ovario", "Porción esponjosa de la uretra masculina", "Termina a nivel del polo inferior del riñón, donde se continúa como uréter"], c:3, e:"Genitourinario."},
+    {q:"¿Dónde desembocan las venas renales?", a:["Vena renal, arteria renal y pelvis renal", "Arteria ilíaca externa", "Vena cava inferior", "Anteversoflexión"], c:2, e:"Genitourinario."},
+    {q:"¿Cuáles son los estrechamientos ureterales?", a:["Pelvis renal", "Fascia transversalis", "Ambos lados del colículo seminal en la uretra prostática", "Estrechamiento pieloureteral (origen), estrechamiento ilíaco (en los vasos ilíacos) y estrechamiento intramural (terminación)"], c:3, e:"Genitourinario."},
+    {q:"¿Cómo está formado el trígono vesical (triángulo de Lietaud)?", a:["Desembocadura de los 2 uréteres y el orificio interno de la uretra", "Por la arteria pudenda interna", "Porción esponjosa de la uretra masculina", "Fascia transversalis"], c:0, e:"Genitourinario."},
+    {q:"¿Cuál es el contenido del espacio retropúbico de Retzius?", a:["Plexo venoso de Santorini", "La arteria uterina pasa medial y arriba de los uréteres, como un puente sobre el río", "Ambos lados del colículo seminal en la uretra prostática", "12ª costilla"], c:0, e:"Genitourinario."},
+    {q:"¿Cuál es la longitud aproximada de la uretra masculina?", a:["12 cm aproximadamente", "16 cm aproximadamente", "8 cm aproximadamente", "20 cm aproximadamente"], c:1, e:"Genitourinario."},
+    {q:"¿Cuáles son las dilataciones de la uretra masculina?", a:["16 cm aproximadamente", "Vena Safena Magna", "Por la arteria pudenda interna", "Prostática, Bulbar y balánica"], c:3, e:"Genitourinario."},
+    {q:"¿Dónde desembocan las glándulas bulbouretrales?", a:["Porción esponjosa de la uretra masculina", "Peritoneo", "Trompa uterina (mesosalpinx)", "Plexo venoso de Santorini"], c:0, e:"Genitourinario."},
+    {q:"¿A dónde desembocan las venas superficiales del pene?", a:["Aorta abdominal", "Arteria ovárica", "Vena Safena Magna", "Arteria umbilical"], c:2, e:"Genitourinario."},
+    {q:"¿Cuál es la posición del útero en la pelvis?", a:["Desembocadura de los 2 uréteres y el orificio interno de la uretra", "Anteversoflexión", "Arteria epigástrica inferior", "Prostática, Bulbar y balánica"], c:1, e:"Genitourinario."},
+  ],
+};
+
+DECKS.todo = [].concat(DECKS.abdomen1, DECKS.abdomen2, DECKS.abdomen3, DECKS.geni);
+
+let currentDeck = 'abdomen1';
+let questions = [];
+let idx = 0;
+let score = 0;
+let streak = 0;
+let results = [];
+let timerInterval = null;
+let timeLeft = 25;
+const TIME_LIMIT = 25;
+
+const menuEl = document.getElementById('menu');
+const gameEl = document.getElementById('game');
+const feedbackEl = document.getElementById('feedback');
+const finalEl = document.getElementById('final');
+
+function iconFor(deck){
+  const map = {
+    abdomen1: document.querySelector('.deck-card.a1 .icon').innerHTML,
+    abdomen2: document.querySelector('.deck-card.a2 .icon').innerHTML,
+    abdomen3: document.querySelector('.deck-card.a3 .icon').innerHTML,
+    geni: document.querySelector('.deck-card.geni .icon').innerHTML,
+    todo: document.querySelector('.deck-card.mix .icon').innerHTML
+  };
+  return map[deck] || '';
+}
+
+function startGame(deck){
+  currentDeck = deck;
+  questions = DECKS[deck].slice().sort(()=>Math.random()-0.5);
+  idx = 0; score = 0; streak = 0; results = [];
+  document.getElementById('qtotal').textContent = questions.length;
+  document.getElementById('qdecklabel').textContent = DECK_META[deck].label;
+  document.getElementById('qicon').innerHTML = iconFor(deck);
+  menuEl.classList.add('hidden');
+  finalEl.classList.add('hidden');
+  feedbackEl.classList.add('hidden');
+  gameEl.classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion(){
+  clearInterval(timerInterval);
+  const item = questions[idx];
+  document.getElementById('qnum').textContent = idx+1;
+  document.getElementById('streak').textContent = streak;
+  document.getElementById('qtext').textContent = item.q;
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  const colors = ['c1','c2','c3','c4'];
+  item.a.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn ' + colors[i%4];
+    btn.innerHTML = '<span class="shape"></span><span>'+opt+'</span>';
+    btn.onclick = ()=>selectAnswer(i);
+    answersEl.appendChild(btn);
+  });
+  timeLeft = TIME_LIMIT;
+  updateTimerBar();
+  timerInterval = setInterval(()=>{
+    timeLeft -= 0.1;
+    updateTimerBar();
+    if(timeLeft<=0){ clearInterval(timerInterval); selectAnswer(-1); }
+  }, 100);
+}
+
+function updateTimerBar(){
+  const pct = Math.max(0, (timeLeft/TIME_LIMIT)*100);
+  const bar = document.getElementById('timerbar');
+  bar.style.width = pct+'%';
+  if(pct < 30){ bar.style.background = 'linear-gradient(90deg, #d9636b, #e8c27a)'; }
+  else{ bar.style.background = 'linear-gradient(90deg, #52b788, #e8c27a)'; }
+}
+
+function selectAnswer(choice){
+  clearInterval(timerInterval);
+  const item = questions[idx];
+  const btns = document.querySelectorAll('.ans-btn');
+  btns.forEach(b=>b.disabled = true);
+  const isCorrect = choice === item.c;
+  if(choice>=0){ btns[choice].classList.add(isCorrect?'correct':'wrong'); }
+  if(!isCorrect){ btns[item.c].classList.add('correct'); }
+
+  if(isCorrect){ score++; streak++; }
+  else{ streak = 0; }
+
+  results.push({q:item.q, correctText:item.a[item.c], chosenText: choice>=0?item.a[choice]:'(sin responder)', ok:isCorrect});
+
+  document.getElementById('fbicon').textContent = isCorrect ? '✅' : (choice<0 ? '⏱️' : '❌');
+  document.getElementById('fbtitle').textContent = isCorrect ? '¡Correcto!' : (choice<0 ? '¡Se acabó el tiempo!' : 'No era esa...');
+  document.getElementById('fbexpl').innerHTML = '<b>Respuesta correcta:</b> '+item.a[item.c]+'<br><br>'+item.e;
+
+  setTimeout(()=>{
+    gameEl.classList.add('hidden');
+    feedbackEl.classList.remove('hidden');
+  }, 500);
+}
+
+function nextQuestion(){
+  feedbackEl.classList.add('hidden');
+  idx++;
+  if(idx >= questions.length){ showFinal(); }
+  else{
+    gameEl.classList.remove('hidden');
+    showQuestion();
+  }
+}
+
+function showFinal(){
+  document.getElementById('finalscore').textContent = score+'/'+questions.length;
+  const pct = Math.round((score/questions.length)*100);
+  let msg = '';
+  if(pct === 100) msg = '🏆 ¡Perfecto! Estás list@ para el parcial.';
+  else if(pct >= 80) msg = '💪 Muy bien, repasá los que fallaste y listo.';
+  else if(pct >= 50) msg = '📚 Vas bien, pero convendría repasar un poco más.';
+  else msg = '🔁 Dale, repasá el gabarito de nuevo y volvé a intentar.';
+  document.getElementById('finalmsg').textContent = msg;
+
+  const list = document.getElementById('reviewlist');
+  list.innerHTML = '';
+  results.filter(r=>!r.ok).forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 'review-item wrong';
+    div.innerHTML = '❌ <span><b>'+r.q+'</b><br>Correcta: '+r.correctText+'</span>';
+    list.appendChild(div);
+  });
+
+  gameEl.classList.add('hidden');
+  feedbackEl.classList.add('hidden');
+  finalEl.classList.remove('hidden');
+}
+
+function backToMenu(){
+  finalEl.classList.add('hidden');
+  menuEl.classList.remove('hidden');
+}
+</script>
+</body>
+</html>
